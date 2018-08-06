@@ -108,5 +108,5 @@ description: "Intended as a documentation theme based on Jekyll for technical wr
 # the description is used in the feed.xml file
 
 # needed for sitemap.xml file only
-url: https://github.com/naver/pinpoint
-baseurl: /pinpoint
+url: https://github.com/naver/pinpoint/v11
+baseurl: /pinpoint/v11
