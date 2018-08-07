@@ -1,6 +1,7 @@
 <script language="javascript" type="text/javascript">
     $(document).ready(function () {
         GetLatestReleaseInfo();
+        GetVersionInfo();
     });
 
     function GetLatestReleaseInfo() {
@@ -10,6 +11,19 @@
             document.getElementById("version").innerHTML = version;
         });
     }
+
+    function GetVersionInfo() {
+        $.getJSON("../version.json").done(function (data) {
+            $.each(data.versions, function(key, val) {
+                alert(val.v);
+                alert(val.urls);
+            })
+        }).fail(function() {
+            alert( "error" );
+        }).always(function() {
+            alert( "complete" );
+        });
+    }
 </script>
 
 
@@ -17,6 +31,18 @@
 
 <ul id="mysidebar" class="nav">
     <li class="sidebarTitle">{{sidebar[0].product}} <object id="version"></object> (stable version)</li>
+    <tr> <td>
+            <div class="nav" style="width:200px;line-height:134%">
+                <select name="ver" onchange="location = this.value;">
+                    <option value="http://127.0.0.1:4000/pinpoint/v11/">1.7.3(Stable)</option>
+                    <option value="http://127.0.0.1:4000/pinpoint/v11/">1.7.2(Stable)</option>
+                    <option value="1">Audi</option>
+                    <option value="2">BMW</option>
+                </select>
+            </div>
+        </td>
+    </tr>
+    <tr></tr>
     <tr> <td><iframe src="https://ghbtns.com/github-btn.html?user=naver&repo=pinpoint&type=star&count=true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
     <iframe src="https://ghbtns.com/github-btn.html?user=naver&repo=pinpoint&type=fork&count=true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
     </td> </tr>

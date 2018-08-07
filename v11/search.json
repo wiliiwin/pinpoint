@@ -247,6 +247,17 @@
 
 
 
+{
+"title": "Roadmap",
+"tags": "",
+"keywords": "roadmap, future",
+"url": "roadmap.html",
+"summary": ""
+}
+,
+
+
+
 
 
 
@@ -262,7 +273,29 @@
 
 
 
+{
+"title": "Techincal Details",
+"tags": "",
+"keywords": "tech, technology",
+"url": "techdetail.html",
+"summary": ""
+}
+,
 
+
+
+
+
+
+
+{
+"title": "Checking network configuration",
+"tags": "",
+"keywords": "troubleshooting",
+"url": "troubleshooting_network.html",
+"summary": ""
+}
+,
 
 
 

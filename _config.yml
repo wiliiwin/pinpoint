@@ -30,8 +30,7 @@ port: 4000
 exclude:
   - .idea/
   - .gitignore
-  - v11/
-  - v1.7.8/
+
 # these are the files and directories that jekyll will exclude from the build
 
 feedback_subject_line: pinpoint

@@ -183,6 +183,12 @@
   
   
   
+  <url>
+    <loc>http://localhost:4000/roadmap.html</loc>
+  </url>
+  
+  
+  
   
   
   
@@ -193,7 +199,19 @@
   
   
   
+  <url>
+    <loc>http://localhost:4000/techdetail.html</loc>
+  </url>
   
+  
+  
+  
+  
+  
+  
+  <url>
+    <loc>http://localhost:4000/troubleshooting_network.html</loc>
+  </url>
   
   
   
