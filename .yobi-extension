@@ -1,0 +1,8 @@
+[
+  {
+    "tabName": "사내Issue",
+    "tabIndex": 3,
+    "url": "https://yobi.navercorp.com/pinpoint/posts",
+    "searchOptions": "status=CLOSED%7COPEN%7CSHARED"
+  }
+]

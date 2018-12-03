@@ -25,9 +25,9 @@ import com.navercorp.pinpoint.bootstrap.context.ServiceInfo;
 import com.navercorp.pinpoint.bootstrap.context.TraceContext;
 import com.navercorp.pinpoint.bootstrap.plugin.test.Expectations;
 import com.navercorp.pinpoint.bootstrap.plugin.test.ExpectedAnnotation;
-import com.navercorp.pinpoint.bootstrap.plugin.test.ExpectedJson;
 import com.navercorp.pinpoint.bootstrap.plugin.test.ExpectedSql;
 import com.navercorp.pinpoint.bootstrap.plugin.test.ExpectedTrace;
+import com.navercorp.pinpoint.bootstrap.plugin.test.ExpectedTraceField;
 import com.navercorp.pinpoint.bootstrap.plugin.test.PluginTestVerifier;
 import com.navercorp.pinpoint.bootstrap.plugin.test.TraceType;
 import com.navercorp.pinpoint.common.service.AnnotationKeyRegistryService;
@@ -40,7 +40,6 @@ import com.navercorp.pinpoint.common.util.ArrayUtils;
 import com.navercorp.pinpoint.common.util.Assert;
 import com.navercorp.pinpoint.common.util.IntStringStringValue;
 import com.navercorp.pinpoint.common.util.IntStringValue;
-import com.navercorp.pinpoint.common.util.StringStringValue;
 import com.navercorp.pinpoint.common.util.StringUtils;
 import com.navercorp.pinpoint.profiler.context.Annotation;
 import com.navercorp.pinpoint.profiler.context.DefaultLocalAsyncId;
@@ -474,7 +473,7 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
 
         @Override
         public Integer getNextAsyncId() {
-            return spanEvent.getAsyncIdObject() != null ? spanEvent.getAsyncIdObject().getAsyncId(): null;
+            return spanEvent.getAsyncIdObject() != null ? spanEvent.getAsyncIdObject().getAsyncId() : null;
         }
 
         @Override
@@ -545,13 +544,13 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
         private final LocalAsyncId localAsyncId;
         private final Integer apiId;
         private final Exception exception;
-        private final String rpc;
-        private final String endPoint;
-        private final String remoteAddr;
-        private final String destinationId;
+        private final ExpectedTraceField rpc;
+        private final ExpectedTraceField endPoint;
+        private final ExpectedTraceField remoteAddr;
+        private final ExpectedTraceField destinationId;
         private final ExpectedAnnotation[] annotations;
 
-        public ResolvedExpectedTrace(Class<?> type, ServiceType serviceType, Integer apiId, Exception exception, String rpc, String endPoint, String remoteAddr, String destinationId, ExpectedAnnotation[] annotations, Integer asyncId) {
+        public ResolvedExpectedTrace(Class<?> type, ServiceType serviceType, Integer apiId, Exception exception, ExpectedTraceField rpc, ExpectedTraceField endPoint, ExpectedTraceField remoteAddr, ExpectedTraceField destinationId, ExpectedAnnotation[] annotations, Integer asyncId) {
             this.type = type;
             this.serviceType = serviceType;
             this.apiId = apiId;
@@ -617,6 +616,15 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
         return expected == null || (expected.equals(actual));
     }
 
+    private static boolean equals(Object expected, String actual) {
+        if (expected instanceof ExpectedTraceField) {
+            return ((ExpectedTraceField) expected).isEquals(actual);
+        }
+
+        // if expected is null, no need to compare.
+        return expected == null || (expected.equals(actual));
+    }
+
     private void verifySpan(ResolvedExpectedTrace expected, ActualTrace actual) {
         if (!expected.type.equals(actual.getType())) {
             throw new AssertionError("Expected an instance of " + expected.type.getSimpleName() + " but was " + actual.getType().getName() + ". expected: " + expected + ", was: " + actual);
@@ -676,13 +684,11 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
             Annotation actualAnnotation = actualAnnotations.get(i);
 
             if (expectedAnnotationKey.getCode() != actualAnnotation.getAnnotationKey()) {
-                throw new AssertionError("Expected " + i + "th annotation [" + expectedAnnotationKey.getCode() + "=" + expect.getValue() + "] but was [" + toString(actualAnnotation) + "], expected: " + expected + ", was: " + actual);
+                throw new AssertionError("Code Different, Expected " + i + "th annotation [" + expectedAnnotationKey.getCode() + "=" + expect.getValue() + "] but was [" + toString(actualAnnotation) + "], expected: " + expected + ", was: " + actual);
             }
 
             if (expectedAnnotationKey == AnnotationKey.SQL_ID && expect instanceof ExpectedSql) {
                 verifySql((ExpectedSql) expect, actualAnnotation);
-            } else if (expectedAnnotationKey == AnnotationKey.JSON && expect instanceof ExpectedJson) {
-                verifyJson((ExpectedJson) expect, actualAnnotation);
             } else {
                 Object expectedValue = expect.getValue();
 
@@ -695,7 +701,8 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
                 }
 
                 if (!Objects.equal(expectedValue, actualAnnotation.getValue())) {
-                    throw new AssertionError("Expected " + i + "th annotation [" + expectedAnnotationKey.getCode() + "=" + expect.getValue() + "] but was [" + toString(actualAnnotation) + "], expected: " + expected + ", was: " + actual);
+
+                    throw new AssertionError("Value Different, Expected " + i + "th annotation [" + expectedAnnotationKey.getCode() + "=" + expect.getValue() + "] but was [" + toString(actualAnnotation) + "], expected: " + expected + ", was: " + actual);
                 }
             }
         }
@@ -734,18 +741,6 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
 
         if (!Objects.equal(value.getStringValue2(), expected.getBindValuesAsString())) {
             throw new AssertionError("Expected sql with bindValues [" + expected.getBindValuesAsString() + "] but was [" + value.getStringValue2() + "], expected: " + expected + ", was: " + actual);
-        }
-    }
-
-    private void verifyJson(ExpectedJson expected, Annotation actual) {
-        StringStringValue value = ((StringStringValue) actual.getValue());
-
-        if (!Objects.equal(value.getStringValue1(), expected.getQuery())) {
-            throw new AssertionError("Expected json with query [" + expected.getQuery() + "] but was [" + value.getStringValue1() + "], expected: " + expected + ", was: " + actual);
-        }
-
-        if (!Objects.equal(value.getStringValue2(), expected.getOutput())) {
-            throw new AssertionError("Expected json with output [" + expected.getOutput() + "] but was [" + value.getStringValue2() + "], expected: " + expected + ", was: " + actual);
         }
     }
 
@@ -788,7 +783,8 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
 
     private TestTcpDataSender getTestTcpDataSender() {
         Injector injector = getInjector();
-        TypeLiteral<EnhancedDataSender<Object>> dataSenderTypeLiteral = new TypeLiteral<EnhancedDataSender<Object>>() {};
+        TypeLiteral<EnhancedDataSender<Object>> dataSenderTypeLiteral = new TypeLiteral<EnhancedDataSender<Object>>() {
+        };
         Key<EnhancedDataSender<Object>> dataSenderKey = Key.get(dataSenderTypeLiteral);
         EnhancedDataSender dataSender = injector.getInstance(dataSenderKey);
         if (dataSender instanceof TestTcpDataSender) {
@@ -893,6 +889,4 @@ public class PluginVerifierExternalAdaptor implements PluginTestVerifier {
 
         }
     }
-
-
 }
