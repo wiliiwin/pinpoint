@@ -29,7 +29,6 @@ import com.navercorp.pinpoint.bootstrap.plugin.jdbc.UnKnownDatabaseInfo;
 import com.navercorp.pinpoint.bootstrap.util.InterceptorUtils;
 import com.navercorp.pinpoint.common.util.StringStringValue;
 import com.navercorp.pinpoint.plugin.mongo.MongoUtil;
-import org.bson.conversions.Bson;
 
 /**
  * @author Roy Kim
@@ -54,6 +53,10 @@ public class MongoRSessionInterceptor extends SpanEventSimpleAroundInterceptorFo
         if (target instanceof DatabaseInfoAccessor) {
             databaseInfo = ((DatabaseInfoAccessor) target)._$PINPOINT$_getDatabaseInfo();
         } else {
+            databaseInfo = null;
+        }
+
+        if (databaseInfo == null) {
             databaseInfo = UnKnownDatabaseInfo.INSTANCE;
         }
 
