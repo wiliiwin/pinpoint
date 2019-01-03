@@ -61,7 +61,11 @@ public class MongoReadPreferenceInterceptor implements AroundInterceptor {
         if (target instanceof DatabaseInfoAccessor) {
             databaseInfo = ((DatabaseInfoAccessor) target)._$PINPOINT$_getDatabaseInfo();
         } else {
-            databaseInfo = UnKnownDatabaseInfo.INSTANCE;
+            databaseInfo = null;
+        }
+
+        if (databaseInfo == null) {
+            databaseInfo = UnKnownDatabaseInfo.MONGO_INSTANCE;
         }
 
         String readPreference = ((ReadPreference) args[0]).getName();

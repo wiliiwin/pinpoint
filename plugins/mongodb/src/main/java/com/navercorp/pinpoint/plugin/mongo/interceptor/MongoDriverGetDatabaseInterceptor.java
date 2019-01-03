@@ -61,7 +61,11 @@ public class MongoDriverGetDatabaseInterceptor implements AroundInterceptor {
         if (target instanceof DatabaseInfoAccessor) {
             databaseInfo = ((DatabaseInfoAccessor) target)._$PINPOINT$_getDatabaseInfo();
         } else {
-            databaseInfo = UnKnownDatabaseInfo.INSTANCE;
+            databaseInfo = null;
+        }
+
+        if (databaseInfo == null) {
+            databaseInfo = UnKnownDatabaseInfo.MONGO_INSTANCE;
         }
 
         databaseInfo = new MongoDatabaseInfo(MongoConstants.MONGODB, MongoConstants.MONGO_EXECUTE_QUERY,
